@@ -1,8 +1,8 @@
-﻿using DataAccessLayer.Models;
+﻿using DAL.Models;
 
-namespace DataAccessLayer.Repositories
+namespace DAL.Repositories
 {
-    public interface IClientRepo
+    public interface IClientRepository
     {
         bool SaveChanges();
 

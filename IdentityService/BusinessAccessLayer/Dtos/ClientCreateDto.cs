@@ -17,6 +17,5 @@ namespace BAL.Dtos
         public string? Email { get; set; }
 
         public double Rating { get; set; }
-
     }
 }

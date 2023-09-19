@@ -19,6 +19,6 @@ namespace BAL.Dtos
 
         public float Rating { get; set; }
 
-        public IEnumerable<ClientRatingDto> clientRatings { get; set; }
+        public List<ClientRatingDto> clientRatingsDtos { get; set; }
     }
 }

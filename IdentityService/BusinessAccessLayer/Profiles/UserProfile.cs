@@ -1,11 +1,6 @@
 ﻿using AutoMapper;
 using BAL.Dtos;
-using DataAccessLayer.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DAL.Models;
 
 namespace BAL.Profiles
 {
@@ -13,16 +8,47 @@ namespace BAL.Profiles
     {
         public UserProfile() 
         {
-            CreateMap<UserRating, ClientRatingDto>();
+            ClientRatingConfiguration();
+            
+            DriverRatingConfiguration();
+            
+            ClientConfiguration();
+            
+            DriverConfiguration();
+        }
 
+        private void DriverRatingConfiguration()
+        {
+            CreateMap<DriverRating, DriverRatingDto>();   
+        }
+
+        private void ClientRatingConfiguration()
+        {
+            CreateMap<ClientRating, ClientRatingDto>();
+        }
+
+        private void ClientConfiguration()
+        {
             CreateMap<Client, ClientReadDto>()
-                .ForMember(dest => dest.clientRatings, opt => opt.MapFrom(src => src.UserRatings));
+               .ForMember(dest => dest.clientRatingsDtos, opt => opt.MapFrom(src => src.ClientRatings));
+            
             CreateMap<ClientReadDto, Client>();
+            
             CreateMap<Client, ClientCreateDto>();
+            
             CreateMap<ClientCreateDto, Client>();
-            CreateMap<Driver, DriverReadDto>();
-            CreateMap<DriverCreateDto, Driver>();
+        }
 
+        private void DriverConfiguration()
+        {
+            CreateMap<Driver, DriverReadDto>()
+                .ForMember(dest => dest.driverRatingDtos, opt => opt.MapFrom(src => src.DriverRatings));
+            
+            CreateMap<DriverReadDto, Driver>();
+
+            CreateMap<Client, ClientCreateDto>();
+
+            CreateMap<DriverCreateDto, Driver>();
         }
     }
 }

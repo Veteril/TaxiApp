@@ -1,14 +1,14 @@
-﻿using DataAccessLayer.Data;
-using DataAccessLayer.Models;
+﻿using DAL.Data;
+using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace DataAccessLayer.Repositories
+namespace DAL.Repositories
 {
-    public class ClientRepo : IClientRepo
+    public class ClientRepository : IClientRepository
     {
         private readonly UserDbContext _dbContext;
 
-        public ClientRepo(UserDbContext dbContext) 
+        public ClientRepository(UserDbContext dbContext) 
         {
             _dbContext = dbContext;
         }
@@ -26,7 +26,7 @@ namespace DataAccessLayer.Repositories
         public async Task<Client> GetClientByIdAsync(int id)
         {
             return await _dbContext.Clients
-                .Include(c => c.UserRatings)
+                .Include(c => c.ClientRatings)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
