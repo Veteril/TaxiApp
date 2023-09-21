@@ -9,7 +9,7 @@ namespace DAL.Models
 
         public int Mark { get; set; }
 
-        public int ClientId { get; set; }
+        public Guid ClientId { get; set; }
         public Client Client { get; set; }
     }
 }

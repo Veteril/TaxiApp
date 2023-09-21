@@ -14,14 +14,10 @@ namespace PresentationLayer.Controllers
     public class ClientsController : ControllerBase
     {
         private readonly ClientsService _clientServ;
-        
-        private readonly IMapper _mapper;
 
         public ClientsController(ClientsService clientServ, IMapper mapper)
         {
             _clientServ = clientServ;
-            
-            _mapper = mapper;
         }
 
         [HttpGet]
@@ -43,14 +39,6 @@ namespace PresentationLayer.Controllers
             }
 
             return Ok(clientReadDto);
-        }
-
-        [HttpPost]
-        public async Task<ActionResult> CreateClientAsync(ClientCreateDto clientCreateDto)
-        {
-            var clientReadDto = await _clientServ.CreateClientAsync(clientCreateDto);
-           
-            return CreatedAtRoute(nameof(GetClientByIdAsync), new { Id = clientReadDto.Id }, clientReadDto);
         }
     }
 }

@@ -6,16 +6,18 @@ using System.Threading.Tasks;
 
 namespace BAL.Dtos
 {
-    public class ClientCreateDto
+    public class DriverCreateDto
     {
         public string Username { get; set; }
 
-        public string PasswordHash { get; set; } 
+        public string Password { get; set; }
+
+        public string Name { get; set; }
 
         public string Phone { get; set; }
 
-        public string? Email { get; set; }
+        public double Rating { get; set; } = 4.5;
 
-        public double Rating { get; set; }
+        public int Experience { get; set; }
     }
 }

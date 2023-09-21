@@ -7,6 +7,8 @@ using BAL.Services;
 using Microsoft.AspNetCore.Server.IIS.Core;
 using System.Runtime.CompilerServices;
 using DAL.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using BAL.Authentication;
 
 namespace PresentationLayer.Extentions
 {
@@ -17,7 +19,7 @@ namespace PresentationLayer.Extentions
         {
             ConfigureRepositories(services);
 
-            ConfigureServices(services);
+            ConfigureServices(services, config);
 
             ConfigureMapper(services);
 
@@ -33,11 +35,15 @@ namespace PresentationLayer.Extentions
             services.AddScoped<IDriverRepository, DriverRepository>();
         }
 
-        private static void ConfigureServices (this IServiceCollection services) 
+        private static void ConfigureServices (this IServiceCollection services, IConfiguration config) 
         {
+            services.Configure<JwtSettings>(config.GetSection(JwtSettings.SectionName));
+
             services.AddScoped<DriversService>();
             
             services.AddScoped<ClientsService>();
+
+            services.AddScoped<TokenService>();
         }
 
         private static void ConfigureMapper(this IServiceCollection services)

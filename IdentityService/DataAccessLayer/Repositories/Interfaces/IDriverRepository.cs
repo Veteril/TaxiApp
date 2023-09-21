@@ -16,5 +16,7 @@ namespace DAL.Repositories.Interfaces
         Task<Driver> GetDriverByIdAsync(int id);
 
         Task CreateDriverAsync(Driver driver);
+
+        Task<Driver> GetDriverByUsernameAsync(string username);
     }
 }

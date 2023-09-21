@@ -29,11 +29,18 @@ namespace DAL.Repositories
             return await _dbContext.Drivers.ToListAsync();
         }
 
+        public async Task<Driver> GetDriverByUsernameAsync(string username)
+        {
+            return await _dbContext.Drivers
+                .Include(c => c.DriverRatings)
+                .FirstOrDefaultAsync(c => c.Username == username);
+        }
+
         public async Task<Driver> GetDriverByIdAsync(int id)
         {
             return await _dbContext.Drivers
                 .Include(d => d.DriverRatings)
-                .FirstOrDefaultAsync(d => d.Id == id);
+                .FirstOrDefaultAsync(d => d.Id.ToString() == id.ToString());
         }
 
         public bool SaveChanges()

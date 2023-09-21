@@ -31,12 +31,14 @@ namespace BAL.Profiles
         {
             CreateMap<Client, ClientReadDto>()
                .ForMember(dest => dest.clientRatingsDtos, opt => opt.MapFrom(src => src.ClientRatings));
-            
+
             CreateMap<ClientReadDto, Client>();
-            
+
             CreateMap<Client, ClientCreateDto>();
-            
+
             CreateMap<ClientCreateDto, Client>();
+
+            CreateMap<Client, UserTokenDto>();
         }
 
         private void DriverConfiguration()
@@ -49,6 +51,8 @@ namespace BAL.Profiles
             CreateMap<Client, ClientCreateDto>();
 
             CreateMap<DriverCreateDto, Driver>();
+
+            CreateMap<Driver, UserTokenDto>();
         }
     }
 }

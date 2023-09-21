@@ -27,7 +27,14 @@ namespace DAL.Repositories
         {
             return await _dbContext.Clients
                 .Include(c => c.ClientRatings)
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .FirstOrDefaultAsync(c => c.Id.ToString() == id.ToString());
+        }
+
+        public async Task<Client> GetClientByUsernameAsync(string username)
+        {
+            return await _dbContext.Clients
+                .Include(c => c.ClientRatings)
+                .FirstOrDefaultAsync(c => c.Username == username);
         }
 
         public bool SaveChanges()

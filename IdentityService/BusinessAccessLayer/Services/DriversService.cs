@@ -14,15 +14,16 @@ namespace BAL.Services
     public class DriversService
     {
         private readonly IMapper _mapper;
-
+        private readonly TokenService _tokenService;
         private readonly IDriverRepository _driverRepo;
 
-        public DriversService(IMapper mapper, IDriverRepository driverRepo)
+        public DriversService(IMapper mapper, IDriverRepository driverRepo, TokenService tokenService)
         {
             _mapper = mapper;
-
             _driverRepo = driverRepo;
+            _tokenService = tokenService;
         }
+
         public async Task<IEnumerable<DriverReadDto>> GetAllDriversAsync()
         {
             var drivers = await _driverRepo.GetAllDriversAsync();
@@ -41,17 +42,45 @@ namespace BAL.Services
             return driverDto;
         }
 
-        public async Task<DriverReadDto> CreateDriverAsync(DriverCreateDto driverCreateDto)
+        public async Task<UserTokenDto> CreateDriverAsync(DriverCreateDto driverCreateDto)
         {
             var driver = _mapper.Map<Driver>(driverCreateDto);
 
+            var hash = _tokenService.CreateHash(driverCreateDto.Password);
+            driver.PasswordHash = hash[0];
+            driver.PasswordSalt = hash[1];
+
+            driver.Id = Guid.NewGuid();
+
+            var token = _tokenService.GetToken(driver.Username, driver.Id);
+
+            var userTokenDto = _mapper.Map<UserTokenDto>(driver);
+            userTokenDto.Token = token;
+
             await _driverRepo.CreateDriverAsync(driver);
-            
+
             _driverRepo.SaveChanges();
-            
-            var driverReadDto = _mapper.Map<DriverReadDto>(driver);
-               
-            return driverReadDto;
+
+            return userTokenDto;
+        }
+
+        public async Task<UserTokenDto> SignInDriverAsync(UserSignInDto driverSignInDto)
+        {
+            var driver = await _driverRepo.GetDriverByUsernameAsync(driverSignInDto.Username);
+
+            var passwordHash = _tokenService.ComputeHash(driverSignInDto.Password, driver.PasswordSalt);
+            if (passwordHash != driver.PasswordHash)
+            {
+                throw new ArgumentException();
+            }
+            else
+            {
+                var userTokenDto = _mapper.Map<UserTokenDto>(driver);
+                var token = _tokenService.GetToken(driver.Username, driver.Id);
+                userTokenDto.Token = token;
+
+                return userTokenDto;
+            }
         }
     }
 }

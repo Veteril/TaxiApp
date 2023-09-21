@@ -9,7 +9,7 @@ namespace BAL.Dtos
 {
     public class ClientReadDto
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string Username { get; set; }
 

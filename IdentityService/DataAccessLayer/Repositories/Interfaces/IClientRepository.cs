@@ -11,5 +11,7 @@ namespace DAL.Repositories
         Task<Client> GetClientByIdAsync(int id);
 
         Task CreateClientAsync(Client client);
+
+        Task<Client> GetClientByUsernameAsync(string username);
     }
 }

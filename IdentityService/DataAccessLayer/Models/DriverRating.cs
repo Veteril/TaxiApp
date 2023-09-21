@@ -12,7 +12,7 @@ namespace DAL.Models
 
         public int Mark { get; set; }
 
-        public int DriverId { get; set; }
+        public Guid DriverId { get; set; }
         public Driver Driver { get; set; }
     }
 }

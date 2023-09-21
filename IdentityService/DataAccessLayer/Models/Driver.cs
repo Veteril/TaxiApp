@@ -9,11 +9,13 @@ namespace DAL.Models
 {
     public  class Driver
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string Username { get; set; }
 
         public string PasswordHash { get; set; }
+
+        public string PasswordSalt { get; set; }     
 
         public string Name { get; set; }
 

@@ -41,13 +41,5 @@ namespace PresentationLayer.Controllers
 
             return Ok(driverReadDto);
         }
-
-        [HttpPost]
-        public async Task<ActionResult> CreateDriverAsync(DriverCreateDto driverCreateDto)
-        {
-            var driverReadDto = await _driverServ.CreateDriverAsync(driverCreateDto);
-           
-            return CreatedAtRoute(nameof(GetDriverByIdAsync), new { Id = driverReadDto.Id }, driverReadDto);
-        }
     }
 }
