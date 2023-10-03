@@ -16,7 +16,9 @@ namespace BAL.Dtos
 
         public string Phone { get; set; }
 
-        public double Rating { get; set; } = 4.5;
+        public string Email { get; set; }
+
+        public double Rating { get; set; }
 
         public int Experience { get; set; }
 

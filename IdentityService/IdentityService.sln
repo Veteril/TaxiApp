@@ -3,11 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33414.496
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationLayer", "PresentationLayer\PresentationLayer.csproj", "{C9E36248-EA43-4E02-B1BD-519A5337A416}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PresentationLayer", "PresentationLayer\PresentationLayer.csproj", "{C9E36248-EA43-4E02-B1BD-519A5337A416}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DataAccessLayer\DAL.csproj", "{DE7C5DCC-F3D3-4909-A3B6-583277360388}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DAL", "DataAccessLayer\DAL.csproj", "{DE7C5DCC-F3D3-4909-A3B6-583277360388}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BAL", "BusinessAccessLayer\BAL.csproj", "{3609BB26-DB31-4093-9014-4D96D26E0775}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BAL", "BusinessAccessLayer\BAL.csproj", "{3609BB26-DB31-4093-9014-4D96D26E0775}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A4D95CDB-B13A-4277-BD2E-72E911715F63}"
+	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

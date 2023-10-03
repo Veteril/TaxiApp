@@ -8,10 +8,16 @@ namespace DAL.Repositories
 
         Task<IEnumerable<Client>> GetAllClientsAsync();
 
-        Task<Client> GetClientByIdAsync(int id);
+        Task<Client> GetClientByIdAsync(string id);
 
         Task CreateClientAsync(Client client);
 
+        void DeleteClient(Client client);
+
         Task<Client> GetClientByUsernameAsync(string username);
+
+        Task<bool> IsPhoneUniqueAsync(string phone, CancellationToken cancellationToken);
+        
+        Task<bool> IsUsernameUniqueAsync(string username, CancellationToken cancellationToken);
     }
-}
+} 

@@ -9,21 +9,31 @@ using System.Runtime.CompilerServices;
 using DAL.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using BAL.Authentication;
+using FluentValidation;
+using BAL.Validators;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace PresentationLayer.Extentions
 {
     public static class ServicesExtention
     {
         public static IServiceCollection AddServices
-            (this IServiceCollection services, IConfiguration config)
+            (this IServiceCollection services, IConfiguration config, IWebHostEnvironment environment)
         {
             ConfigureRepositories(services);
 
-            ConfigureServices(services, config);
+            ConfigureAuthentication(services, config);
+
+            ConfigureServices(services);
 
             ConfigureMapper(services);
 
-            ConfigureDatabaseContext(services);
+            ConfigureDatabaseContext(services, environment, config);
 
             return services;
         }
@@ -35,15 +45,17 @@ namespace PresentationLayer.Extentions
             services.AddScoped<IDriverRepository, DriverRepository>();
         }
 
-        private static void ConfigureServices (this IServiceCollection services, IConfiguration config) 
+        private static void ConfigureServices (this IServiceCollection services) 
         {
-            services.Configure<JwtSettings>(config.GetSection(JwtSettings.SectionName));
-
             services.AddScoped<DriversService>();
             
             services.AddScoped<ClientsService>();
 
             services.AddScoped<TokenService>();
+
+            services.AddScoped<HashService>();
+
+            services.AddValidatorsFromAssemblyContaining<IAssemblyMarker>();
         }
 
         private static void ConfigureMapper(this IServiceCollection services)
@@ -51,10 +63,42 @@ namespace PresentationLayer.Extentions
             services.AddAutoMapper(typeof(UserProfile).Assembly);
         }
 
-        private static void ConfigureDatabaseContext(this IServiceCollection services)
+        private static void ConfigureDatabaseContext(this IServiceCollection services, IWebHostEnvironment environment, IConfiguration config)
         {
-            services.AddDbContext<UserDbContext>(options =>
-                options.UseInMemoryDatabase(databaseName: "InMemoryDatabase"));
+            if (environment.IsDevelopment()) 
+            {
+                Console.WriteLine("Using Local connection");
+                services.AddDbContext<UserDbContext>(opt =>
+                    opt.UseSqlServer(config.GetConnectionString("IdentityConnectionLocal")));
+            }
+            else 
+            {
+                Console.WriteLine("Using K8S connection");
+                services.AddDbContext<UserDbContext>(opt =>
+                    opt.UseSqlServer(config.GetConnectionString("IdentityConnectionK8S")));
+            }
+        }
+
+        private static void ConfigureAuthentication(this IServiceCollection services, IConfiguration config)
+        {
+            services.Configure<JwtSettings>(config.GetSection(JwtSettings.SectionName));
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    var serviceProvider = services.BuildServiceProvider();
+                    var authenticationOptions = serviceProvider.GetRequiredService<IOptions<JwtSettings>>().Value;
+
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationOptions.Secret)),
+                        ValidateIssuer = true,
+                        ValidIssuer = authenticationOptions.Issuer,
+                        ValidateAudience = true,
+                        ValidAudience = authenticationOptions.Audience,
+                        ValidateLifetime = true
+                    };
+                });
         }
     }
 }

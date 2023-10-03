@@ -36,11 +36,26 @@ namespace DAL.Repositories
                 .FirstOrDefaultAsync(c => c.Username == username);
         }
 
-        public async Task<Driver> GetDriverByIdAsync(int id)
+        public async Task<Driver> GetDriverByIdAsync(string id)
         {
             return await _dbContext.Drivers
                 .Include(d => d.DriverRatings)
                 .FirstOrDefaultAsync(d => d.Id.ToString() == id.ToString());
+        }
+
+        public async Task<bool> IsPhoneUniqueAsync(string phone, CancellationToken cancellationToken)
+        {
+            return !await _dbContext.Drivers.AnyAsync(c => c.Phone == phone);
+        }
+
+        public async Task<bool> IsUsernameUniqueAsync(string username, CancellationToken cancellationToken)
+        {
+            return !await _dbContext.Drivers.AnyAsync(c => c.Username == username);
+        }
+
+        public void DeleteDriver(Driver driver)
+        {
+            _dbContext.Drivers.Remove(driver);
         }
 
         public bool SaveChanges()

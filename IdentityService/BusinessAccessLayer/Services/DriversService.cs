@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BAL.Dtos;
+using BAL.Exceptions;
 using DAL.Models;
 using DAL.Repositories;
 using DAL.Repositories.Interfaces;
@@ -16,26 +17,33 @@ namespace BAL.Services
         private readonly IMapper _mapper;
         private readonly TokenService _tokenService;
         private readonly IDriverRepository _driverRepo;
+        private readonly HashService _hashService;
 
-        public DriversService(IMapper mapper, IDriverRepository driverRepo, TokenService tokenService)
+        public DriversService(IMapper mapper, IDriverRepository driverRepo, TokenService tokenService, HashService hashService)
         {
             _mapper = mapper;
             _driverRepo = driverRepo;
             _tokenService = tokenService;
+            _hashService = hashService;
         }
 
         public async Task<IEnumerable<DriverReadDto>> GetAllDriversAsync()
         {
             var drivers = await _driverRepo.GetAllDriversAsync();
-            
+
             var driversReadDtos = _mapper.Map<List<DriverReadDto>>(drivers);
-            
+
             return driversReadDtos;
         }
 
-        public async Task<DriverReadDto> GetDriverByIdAsync(int id)
+        public async Task<DriverReadDto> GetDriverByIdAsync(string id)
         {
             var driver = await _driverRepo.GetDriverByIdAsync(id);
+
+            if (driver == null)
+            {
+                throw new NotFoundException($"Can`t find driver with such id: {id}");
+            }
 
             var driverDto = _mapper.Map<DriverReadDto>(driver);
 
@@ -46,13 +54,13 @@ namespace BAL.Services
         {
             var driver = _mapper.Map<Driver>(driverCreateDto);
 
-            var hash = _tokenService.CreateHash(driverCreateDto.Password);
+            var hash = _hashService.CreateHash(driverCreateDto.Password);
             driver.PasswordHash = hash[0];
             driver.PasswordSalt = hash[1];
 
             driver.Id = Guid.NewGuid();
 
-            var token = _tokenService.GetToken(driver.Username, driver.Id);
+            var token = _tokenService.GetToken(driver.Username, driver.Id, "Driver");
 
             var userTokenDto = _mapper.Map<UserTokenDto>(driver);
             userTokenDto.Token = token;
@@ -68,19 +76,32 @@ namespace BAL.Services
         {
             var driver = await _driverRepo.GetDriverByUsernameAsync(driverSignInDto.Username);
 
-            var passwordHash = _tokenService.ComputeHash(driverSignInDto.Password, driver.PasswordSalt);
+            var passwordHash = _hashService.ComputeHash(driverSignInDto.Password, driver.PasswordSalt);
             if (passwordHash != driver.PasswordHash)
             {
                 throw new ArgumentException();
             }
-            else
-            {
-                var userTokenDto = _mapper.Map<UserTokenDto>(driver);
-                var token = _tokenService.GetToken(driver.Username, driver.Id);
-                userTokenDto.Token = token;
+            var userTokenDto = _mapper.Map<UserTokenDto>(driver);
+            var token = _tokenService.GetToken(driver.Username, driver.Id, "Driver");
+            userTokenDto.Token = token;
 
-                return userTokenDto;
+            return userTokenDto;
+        }
+
+        public async Task<DriverReadDto> DeleteDriverAsync(string id)
+        {
+            var driver = await _driverRepo.GetDriverByIdAsync(id);
+
+            if (driver == null)
+            {
+                throw new NotFoundException($"Can`t find driver with such id: {id}");
             }
+
+            _driverRepo.DeleteDriver(driver);
+            _driverRepo.SaveChanges();
+
+            var driverReadDto = _mapper.Map<DriverReadDto>(driver);
+            return driverReadDto;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BAL.Dtos;
+using BAL.Exceptions;
 using DAL.Data;
 using DAL.Models;
 using DAL.Repositories;
@@ -17,33 +18,37 @@ namespace BAL.Services
     public class ClientsService
     {
         private readonly TokenService _tokenService;
-
         private readonly IMapper _mapper;
-        
         private readonly IClientRepository _clientRepo;
+        private readonly HashService _hashService;
 
-        public ClientsService(IMapper mapper, IClientRepository clientRepo, TokenService tokenService)
+        public ClientsService(IMapper mapper, IClientRepository clientRepo, TokenService tokenService, HashService hashService)
         {
             _mapper = mapper;
-
             _clientRepo = clientRepo;
             _tokenService = tokenService;
+            _hashService = hashService;
         }
         public async Task<IEnumerable<ClientReadDto>> GetAllClientsAsync()
         {
-            var clients  = await _clientRepo.GetAllClientsAsync();
-            
+            var clients = await _clientRepo.GetAllClientsAsync();
+
             var clientReadDtos = _mapper.Map<List<ClientReadDto>>(clients);
 
             return clientReadDtos;
         }
 
-        public async Task<ClientReadDto> GetClientByIdAsync(int id)
+        public async Task<ClientReadDto> GetClientByIdAsync(string id)
         {
             var client = await _clientRepo.GetClientByIdAsync(id);
-            
+
+            if (client == null)
+            {
+                throw new NotFoundException($"Can`t find client with such id: {id}");
+            }
+
             var clientDto = _mapper.Map<ClientReadDto>(client);
-            
+
             return clientDto;
         }
 
@@ -60,13 +65,13 @@ namespace BAL.Services
         {
             var client = _mapper.Map<Client>(clientCreateDto);
 
-            var hash = _tokenService.CreateHash(clientCreateDto.Password);
+            var hash = _hashService.CreateHash(clientCreateDto.Password);
             client.PasswordHash = hash[0];
             client.PasswordSalt = hash[1];
-            
+
             client.Id = Guid.NewGuid();
 
-            var token = _tokenService.GetToken(client.Username, client.Id);
+            var token = _tokenService.GetToken(client.Username, client.Id, "Client");
 
             var userTokenDto = _mapper.Map<UserTokenDto>(client);
             userTokenDto.Token = token;
@@ -74,7 +79,7 @@ namespace BAL.Services
             await _clientRepo.CreateClientAsync(client);
 
             _clientRepo.SaveChanges();
-                
+
             return userTokenDto;
         }
 
@@ -82,19 +87,33 @@ namespace BAL.Services
         {
             var client = await _clientRepo.GetClientByUsernameAsync(clientSignInDto.Username);
 
-            var passwordHash = _tokenService.ComputeHash(clientSignInDto.Password, client.PasswordSalt);
-            if (passwordHash != client.PasswordHash) 
+            var passwordHash = _hashService.ComputeHash(clientSignInDto.Password, client.PasswordSalt);
+            if (passwordHash != client.PasswordHash)
             {
                 throw new ArgumentException();
             }
-            else
-            {
-                var userTokenDto = _mapper.Map<UserTokenDto>(client);
-                var token = _tokenService.GetToken(client.Username, client.Id);
-                userTokenDto.Token = token;
+            var userTokenDto = _mapper.Map<UserTokenDto>(client);
+            var token = _tokenService.GetToken(client.Username, client.Id, "Client");
+            userTokenDto.Token = token;
 
-                return userTokenDto;
+            return userTokenDto;
+        }
+
+        public async Task<ClientReadDto> DeleteClientAsync(string id)
+        {
+            var client = await _clientRepo.GetClientByIdAsync(id);
+
+            if (client == null)
+            {
+                throw new NotFoundException($"Can`t find client with such id: {id}");
             }
+
+            _clientRepo.DeleteClient(client);
+            _clientRepo.SaveChanges();
+
+            var clientReadDto = _mapper.Map<ClientReadDto>(client);
+
+            return clientReadDto;
         }
     }
 }

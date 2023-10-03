@@ -21,6 +21,8 @@ namespace DAL.Models
 
         public string Phone { get; set; }
 
+        public string Email { get; set; }
+
         public double Rating { get; set; } = 4.5;
 
         public int Experience { get; set; }
