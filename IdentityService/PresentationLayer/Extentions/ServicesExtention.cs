@@ -35,6 +35,7 @@ namespace PresentationLayer.Extentions
 
             ConfigureDatabaseContext(services, environment, config);
 
+
             return services;
         }
 
@@ -54,6 +55,8 @@ namespace PresentationLayer.Extentions
             services.AddScoped<TokenService>();
 
             services.AddScoped<HashService>();
+
+            services.AddSignalR();
 
             services.AddValidatorsFromAssemblyContaining<IAssemblyMarker>();
         }

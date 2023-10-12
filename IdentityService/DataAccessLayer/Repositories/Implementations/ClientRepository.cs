@@ -36,6 +36,11 @@ namespace DAL.Repositories
                 .FirstOrDefaultAsync(c => c.Id.ToString() == id.ToString());
         }
 
+        public async Task<Client> GetClientByRefreshTokenAsync(string refreshToken)
+        {
+            return await _dbContext.Clients.FirstOrDefaultAsync(c => c.RefreshToken == refreshToken);
+        }
+
         public async Task<Client> GetClientByUsernameAsync(string username)
         {
             return await _dbContext.Clients

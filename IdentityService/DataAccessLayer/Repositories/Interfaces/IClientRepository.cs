@@ -19,5 +19,7 @@ namespace DAL.Repositories
         Task<bool> IsPhoneUniqueAsync(string phone, CancellationToken cancellationToken);
         
         Task<bool> IsUsernameUniqueAsync(string username, CancellationToken cancellationToken);
+
+        Task<Client> GetClientByRefreshTokenAsync(string refreshToken);
     }
 } 

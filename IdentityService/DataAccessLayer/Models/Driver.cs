@@ -27,6 +27,8 @@ namespace DAL.Models
 
         public int Experience { get; set; }
 
+        public string? RefreshToken {  get; set; }
+
         public ICollection<DriverRating> DriverRatings { get; set;}
     }
 }

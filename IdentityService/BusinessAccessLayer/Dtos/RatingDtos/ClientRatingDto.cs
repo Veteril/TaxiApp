@@ -13,6 +13,6 @@ namespace BAL.Dtos
 
         public int Mark { get; set; }
 
-        public int ClientId { get; set; }
+        public Guid ClientId { get; set; }
     }
 }

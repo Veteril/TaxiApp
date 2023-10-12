@@ -59,6 +59,15 @@ namespace PresentationLayer
             });
             });
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowReactApp",
+                    builder => builder.WithOrigins("http://localhost:3000")
+                                     .AllowAnyHeader()
+                                     .AllowAnyMethod()
+                                     .AllowCredentials());
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -71,9 +80,9 @@ namespace PresentationLayer
             {
                 PrepDb.UseMigration(app);
             }
-
+            app.UseCors("AllowReactApp");
             app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseAuthentication();
             app.UseAuthorization();

@@ -72,9 +72,13 @@ namespace BAL.Services
             client.Id = Guid.NewGuid();
 
             var token = _tokenService.GetToken(client.Username, client.Id, "Client");
+           
+            var refreshToken = _tokenService.GetRefreshToken(client.Id);
+            client.RefreshToken = refreshToken;
 
             var userTokenDto = _mapper.Map<UserTokenDto>(client);
             userTokenDto.Token = token;
+            userTokenDto.RefreshToken = refreshToken;
 
             await _clientRepo.CreateClientAsync(client);
 
@@ -94,6 +98,12 @@ namespace BAL.Services
             }
             var userTokenDto = _mapper.Map<UserTokenDto>(client);
             var token = _tokenService.GetToken(client.Username, client.Id, "Client");
+            var refreshToken = _tokenService.GetRefreshToken(client.Id);
+            
+            client.RefreshToken = refreshToken;
+            _clientRepo.SaveChanges();
+
+            userTokenDto.RefreshToken = refreshToken;
             userTokenDto.Token = token;
 
             return userTokenDto;
@@ -114,6 +124,35 @@ namespace BAL.Services
             var clientReadDto = _mapper.Map<ClientReadDto>(client);
 
             return clientReadDto;
+        }
+
+        public async Task LogoutAsync(string id)
+        {
+            var client = await _clientRepo.GetClientByIdAsync(id);
+            if (client == null)
+            {
+                throw new NotFoundException($"Can`t find client with such id: {id}");
+            }
+
+            client.RefreshToken = null;
+            _clientRepo.SaveChanges();
+
+            return;
+        }
+
+        public async Task<UserTokenDto> RefreshAccessTokenAsync(string refreshToken)
+        {
+            var client = await _clientRepo.GetClientByRefreshTokenAsync(refreshToken);
+            if (client == null)
+            {
+                throw new NotFoundException($"Invalid refresh token");
+            }
+
+            var userTokenDto = _mapper.Map<UserTokenDto>(client);
+            var token = _tokenService.GetToken(client.Username, client.Id, "Client");
+            userTokenDto.Token = token;
+            
+            return userTokenDto;
         }
     }
 }

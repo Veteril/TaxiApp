@@ -61,9 +61,12 @@ namespace BAL.Services
             driver.Id = Guid.NewGuid();
 
             var token = _tokenService.GetToken(driver.Username, driver.Id, "Driver");
+            var refreshToken = _tokenService.GetRefreshToken(driver.Id);
+            driver.RefreshToken = refreshToken;
 
             var userTokenDto = _mapper.Map<UserTokenDto>(driver);
             userTokenDto.Token = token;
+            userTokenDto.RefreshToken = refreshToken;
 
             await _driverRepo.CreateDriverAsync(driver);
 
@@ -83,6 +86,12 @@ namespace BAL.Services
             }
             var userTokenDto = _mapper.Map<UserTokenDto>(driver);
             var token = _tokenService.GetToken(driver.Username, driver.Id, "Driver");
+            var refreshToken = _tokenService.GetRefreshToken(driver.Id);
+
+            driver.RefreshToken = refreshToken;
+            _driverRepo.SaveChanges();
+
+            userTokenDto.RefreshToken = refreshToken;
             userTokenDto.Token = token;
 
             return userTokenDto;

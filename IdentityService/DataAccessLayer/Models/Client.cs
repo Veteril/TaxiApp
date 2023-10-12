@@ -19,6 +19,8 @@ namespace DAL.Models
 
         public double Rating { get; set; } = 4.5;
 
+        public string? RefreshToken {  get; set; }
+
         public ICollection<ClientRating> ClientRatings { get; set; }
     }
 }
