@@ -9,7 +9,7 @@ using System.Text;
 
 namespace BAL.Services
 {
-    public class TokenService
+    public class TokenService : ITokenService
     {
         private readonly JwtSettings _jwtSettings;
 

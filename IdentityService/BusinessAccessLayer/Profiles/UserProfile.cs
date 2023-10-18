@@ -8,51 +8,41 @@ namespace BAL.Profiles
     {
         public UserProfile() 
         {
-            ClientRatingConfiguration();
+            UserRatingConfiguration();
             
-            DriverRatingConfiguration();
+            UserClientConfiguration();
             
-            ClientConfiguration();
-            
-            DriverConfiguration();
+            UserDriverConfiguration();
         }
 
-        private void DriverRatingConfiguration()
+        private void UserRatingConfiguration()
         {
-            CreateMap<DriverRating, DriverRatingDto>();   
+            CreateMap<UserRating, UserRatingDto>();
         }
 
-        private void ClientRatingConfiguration()
+        private void UserClientConfiguration()
         {
-            CreateMap<ClientRating, ClientRatingDto>();
+            CreateMap<User, ClientReadDto>()
+               .ForMember(dest => dest.UserRatingDtos, opt => opt.MapFrom(src => src.UserRatings));
+
+            CreateMap<ClientReadDto, User>();
+
+            CreateMap<User, ClientCreateDto>();
+
+            CreateMap<ClientCreateDto, User>();
+
+            CreateMap<User, UserTokenDto>();
         }
 
-        private void ClientConfiguration()
+        private void UserDriverConfiguration()
         {
-            CreateMap<Client, ClientReadDto>()
-               .ForMember(dest => dest.clientRatingsDtos, opt => opt.MapFrom(src => src.ClientRatings));
+            CreateMap<DriverCreateDto, User>();
 
-            CreateMap<ClientReadDto, Client>();
+            CreateMap<DriverInfo, DriverInfoDto>();
 
-            CreateMap<Client, ClientCreateDto>();
-
-            CreateMap<ClientCreateDto, Client>();
-
-            CreateMap<Client, UserTokenDto>();
-        }
-
-        private void DriverConfiguration()
-        {
-            CreateMap<Driver, DriverReadDto>()
-                .ForMember(dest => dest.driverRatingDtos, opt => opt.MapFrom(src => src.DriverRatings));
-            
-            CreateMap<DriverReadDto, Driver>();
-
-            CreateMap<Client, ClientCreateDto>();
-
-            CreateMap<DriverCreateDto, Driver>();
-
-            CreateMap<Driver, UserTokenDto>();
+            CreateMap<User, DriverReadDto>()
+                .ForMember(dest => dest.DriverInfoDto, opt => opt.MapFrom(src => src.DriverInfo))
+                .ForMember(dest => dest.UserRatingDtos, opt => opt.MapFrom(src => src.UserRatings));
         }
     }
 }

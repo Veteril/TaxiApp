@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace DAL.Models
 {
-    public class DriverRating
+    public class UserRating
     {
         public int Id { get; set; }
 
         public int Mark { get; set; }
 
-        public Guid DriverId { get; set; }
-        public Driver Driver { get; set; }
+        public Guid UserId { get; set; }
+        public User User { get; set; }
     }
 }

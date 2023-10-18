@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BAL.Services
 {
-    public class HashService
+    public class HashService : IHashService
     {
         public List<string> CreateHash(string password)
         {

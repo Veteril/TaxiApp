@@ -4,9 +4,11 @@ using BAL.Services;
 using BAL.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
@@ -19,14 +21,15 @@ namespace PresentationLayer.Controllers
     {
         private readonly ClientCreateDtoValidator _clientValidator;
         private readonly DriverCreateDtoValidator _driverValidator;
-        private readonly ClientsService _clientsService;
-        private readonly DriversService _driversService;
-        private readonly TokenService _tokenService;
+        private readonly IUserService _userService;
+        private readonly ITokenService _tokenService;
 
-        public AuthorizationController(ClientsService clientsService, DriversService driversService, ClientCreateDtoValidator clientValidator, DriverCreateDtoValidator driverValidator, TokenService tokenService)
+        public AuthorizationController(IUserService userService,
+            ClientCreateDtoValidator clientValidator,
+            DriverCreateDtoValidator driverValidator,
+            ITokenService tokenService)
         {
-            _clientsService = clientsService;
-            _driversService = driversService;
+            _userService = userService;
             _clientValidator = clientValidator;
             _driverValidator = driverValidator;
             _tokenService = tokenService;
@@ -38,17 +41,10 @@ namespace PresentationLayer.Controllers
             var validationResult = await _clientValidator.ValidateAsync(clientCreateDto);
             if (!validationResult.IsValid)
             {
-                var modelStateDictionary = new ModelStateDictionary();
-                foreach (var item in validationResult.Errors)
-                {
-                    modelStateDictionary.AddModelError(
-                        item.PropertyName,
-                        item.ErrorMessage
-                        );
-                    return ValidationProblem(modelStateDictionary);
-                }
+                return ReturnValidationProblem(validationResult);
             }
-            var userTokenDto = await _clientsService.CreateClientAsync(clientCreateDto);
+
+            var userTokenDto = await _userService.CreateClientAsync(clientCreateDto);
 
             var refreshToken = userTokenDto.RefreshToken;
 
@@ -56,21 +52,7 @@ namespace PresentationLayer.Controllers
 
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
 
-            return CreatedAtRoute(nameof(ClientsController.GetClientByIdAsync), new { Id = userTokenDto.Id }, userTokenDto);
-        }
-
-        [HttpPost("signin/client")]
-        public async Task<ActionResult> SignInClientAsync(UserSignInDto clientSignInDto)
-        {
-            var userTokenDto = await _clientsService.SignInClientAsync(clientSignInDto);
-
-            var refreshToken = userTokenDto.RefreshToken;
-
-            var cookieOptions = _tokenService.GetCookieOptionsForRefreshToken();
-
-            Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
-
-            return Ok(userTokenDto);
+            return CreatedAtRoute(nameof(UsersController.GetUserByIdAsync), new { Id = userTokenDto.Id }, userTokenDto);
         }
 
         [HttpPost("signup/driver")]
@@ -79,18 +61,10 @@ namespace PresentationLayer.Controllers
             var validationResult = await _driverValidator.ValidateAsync(driverCreateDto);
             if (!validationResult.IsValid)
             {
-                var modelStateDictionary = new ModelStateDictionary();
-                foreach (var item in validationResult.Errors)
-                {
-                    modelStateDictionary.AddModelError(
-                        item.PropertyName,
-                        item.ErrorMessage
-                        );
-                    return ValidationProblem(modelStateDictionary);
-                }
+                return ReturnValidationProblem(validationResult);
             }
 
-            var userTokenDto = await _driversService.CreateDriverAsync(driverCreateDto);
+            var userTokenDto = await _userService.CreateDriverAsync(driverCreateDto);
 
             var refreshToken = userTokenDto.RefreshToken;
 
@@ -98,18 +72,17 @@ namespace PresentationLayer.Controllers
 
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
 
-            return CreatedAtRoute(nameof(DriversController.GetDriverByIdAsync), new { Id = userTokenDto.Id }, userTokenDto);
+            return CreatedAtRoute(nameof(UsersController.GetUserByIdAsync), new { Id = userTokenDto.Id }, userTokenDto);
         }
 
-        [HttpPost("signin/driver")]
-        public async Task<ActionResult<UserTokenDto>> SignInDtiverAsync(UserSignInDto driverSignInDto)
+        [HttpPost("signin")]
+        public async Task<ActionResult> SignInUserAsync(UserSignInDto clientSignInDto)
         {
-            var userTokenDto = await _driversService.SignInDriverAsync(driverSignInDto);
+            var userTokenDto = await _userService.SignInUserAsync(clientSignInDto);
 
             var refreshToken = userTokenDto.RefreshToken;
 
             var cookieOptions = _tokenService.GetCookieOptionsForRefreshToken();
-
 
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
 
@@ -117,25 +90,38 @@ namespace PresentationLayer.Controllers
         }
 
         [Authorize]
-        [HttpPost("client/logout")]
+        [HttpPost("logout")]
         public async Task<ActionResult> LogoutAsync()
         {
             Response.Cookies.Delete("refreshToken");
             var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            await _clientsService.LogoutAsync(id);
+            await _userService.LogoutAsync(id);
 
             return Ok();
         }
 
-        [HttpGet("client/refresh")]
+        [HttpGet("refresh")]
         public async Task<ActionResult<UserTokenDto>> RefreshTokenAsync()
         {
             string refreshToken = Request.Cookies["refreshToken"];
             if (refreshToken == null) { return Unauthorized(); }
 
-            var userTokenDto = await _clientsService.RefreshAccessTokenAsync(refreshToken);
+            var userTokenDto = await _userService.RefreshAccessTokenAsync(refreshToken);
 
             return Ok(userTokenDto);
+        }
+
+        private ActionResult ReturnValidationProblem(FluentValidation.Results.ValidationResult validationResult)
+        {
+            var modelStateDictionary = new ModelStateDictionary();
+            foreach (var item in validationResult.Errors)
+            {
+                modelStateDictionary.AddModelError(
+                    item.PropertyName,
+                    item.ErrorMessage
+                    );
+            }
+            return ValidationProblem(modelStateDictionary);
         }
     }
 }

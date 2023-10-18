@@ -6,7 +6,6 @@ using BAL.Profiles;
 using BAL.Services;
 using Microsoft.AspNetCore.Server.IIS.Core;
 using System.Runtime.CompilerServices;
-using DAL.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using BAL.Authentication;
 using FluentValidation;
@@ -41,20 +40,17 @@ namespace PresentationLayer.Extentions
 
         private static void ConfigureRepositories(this IServiceCollection services)
         {
-            services.AddScoped<IClientRepository, ClientRepository>();
-            
-            services.AddScoped<IDriverRepository, DriverRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
         }
 
         private static void ConfigureServices (this IServiceCollection services) 
         {
-            services.AddScoped<DriversService>();
             
-            services.AddScoped<ClientsService>();
+            services.AddScoped<IUserService , UserService>();
 
-            services.AddScoped<TokenService>();
+            services.AddScoped<ITokenService, TokenService>();
 
-            services.AddScoped<HashService>();
+            services.AddScoped<IHashService, HashService>();
 
             services.AddSignalR();
 

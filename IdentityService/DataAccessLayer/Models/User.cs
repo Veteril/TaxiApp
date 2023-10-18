@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DAL.Models
 {
-    public class Client
+    public class User
     {
         public Guid Id { get; set; }
 
@@ -15,12 +15,17 @@ namespace DAL.Models
 
         public string Phone { get; set; }
         
-        public string? Email { get; set; }
+        public string Email { get; set; }
 
         public double Rating { get; set; } = 4.5;
 
         public string? RefreshToken {  get; set; }
 
-        public ICollection<ClientRating> ClientRatings { get; set; }
+        public string Role {  get; set; }
+
+        public Guid? DriverInfoId {  get; set; }
+        public DriverInfo DriverInfo {  get; set; }
+
+        public ICollection<UserRating> UserRatings { get; set; }
     }
 }
