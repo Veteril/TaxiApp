@@ -12,7 +12,11 @@ namespace BAL.Authentication
 
         public string Secret { get; init; }
 
+        public string RefreshSecret { get; init; }
+
         public int ExpiryMinutes { get; init; }
+
+        public int RefreshExpiryDays { get; init; }
 
         public string Issuer { get; init; }
 

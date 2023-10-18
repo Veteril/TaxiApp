@@ -1,6 +1,6 @@
 ﻿using BAL.Dtos;
 using DAL.Repositories;
-using DAL.Repositories.Interfaces;
+using DAL.Repositories;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
@@ -12,10 +12,10 @@ namespace BAL.Validators
 {
     public class DriverCreateDtoValidator : AbstractValidator<DriverCreateDto>
     {
-        private readonly IDriverRepository _driverRepository;
-        public DriverCreateDtoValidator(IDriverRepository driverRepository)
+        private readonly IUserRepository _userRepository;
+        public DriverCreateDtoValidator(IUserRepository userRepository)
         {
-            _driverRepository = driverRepository;
+            _userRepository = userRepository;
             
             RuleFor(dr => dr.Phone).Matches(@"^\+375\d+$").WithMessage("{PropertyName} must start with '+375' and contain only numbers.")
                 .Length(13).WithMessage("{PropertyName} must be 13 characters long.")
@@ -38,12 +38,12 @@ namespace BAL.Validators
 
         private async Task<bool> IsUsernameUniqueAsync(string username, CancellationToken cancellationToken)
         {
-            return await _driverRepository.IsUsernameUniqueAsync(username, cancellationToken);
+            return await _userRepository.IsUsernameUniqueAsync(username, cancellationToken);
         }
 
         private async Task<bool> IsPhoneUniqueAsync(string phone, CancellationToken cancellationToken)
         {
-            return await _driverRepository.IsPhoneUniqueAsync(phone, cancellationToken);
+            return await _userRepository.IsPhoneUniqueAsync(phone, cancellationToken);
         }
     }
 }

@@ -8,53 +8,56 @@ namespace DAL.Data
     {
         public UserDbContext(DbContextOptions<UserDbContext> opt) : base(opt) {}
 
-        public DbSet<Client> Clients { get; set; }
+        public DbSet<User> Users { get; set; }
 
-        public DbSet<Driver> Drivers { get; set; }
+        public DbSet<UserRating> UserRatings { get; set; }
 
-        public DbSet<ClientRating> ClientRatings { get; set; }
-
-        public DbSet<DriverRating> DriverRatings { get; set; }
+        public DbSet<DriverInfo> DriversInfo { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            ClientRatingConfiguration(modelBuilder);
+            UserRatingConfiguration(modelBuilder);
             
-            DriverRatingConfiguration(modelBuilder);
+            UserConfiguration(modelBuilder);
             
-            ClientConfiguration(modelBuilder);
-            
-            DriverConfiguration(modelBuilder);
+            DriverInfoConfiguration(modelBuilder);
         }
 
-        private void ClientRatingConfiguration(ModelBuilder modelBuilder)
+        private void UserRatingConfiguration(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ClientRating>()
-                .HasOne(cr => cr.Client)
-                .WithMany(c => c.ClientRatings)
-                .HasForeignKey(cr => cr.ClientId)
+            modelBuilder.Entity<UserRating>()
+                .HasOne(cr => cr.User)
+                .WithMany(c => c.UserRatings)
+                .HasForeignKey(cr => cr.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
 
-        private void DriverRatingConfiguration(ModelBuilder modelBuilder)
+        private void UserConfiguration(ModelBuilder modelBuilder) 
         {
-            modelBuilder.Entity<DriverRating>()
-                .HasOne(dr => dr.Driver)
-                .WithMany(d => d.DriverRatings)
-                .HasForeignKey(dr => dr.DriverId)
-                .OnDelete(DeleteBehavior.Cascade);
-        }
-
-        private void ClientConfiguration(ModelBuilder modelBuilder) 
-        {
-            modelBuilder.Entity<Client>()
+            modelBuilder.Entity<User>()
                 .HasKey(c => c.Id);
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.DriverInfo)
+                .WithOne(di => di.User)
+                .HasForeignKey<User>(di => di.DriverInfoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<User>()
+                .Property(u => u.DriverInfoId)
+                .IsRequired(false);
         }
 
-        private void DriverConfiguration(ModelBuilder modelBuilder)
+        private void DriverInfoConfiguration(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Driver>()
-                .HasKey(d => d.Id);
+            modelBuilder.Entity<DriverInfo>()
+                .HasKey(di => di.Id);
+
+            modelBuilder.Entity<DriverInfo>()
+                .HasOne(di => di.User)
+                .WithOne(u => u.DriverInfo)
+                .HasForeignKey<DriverInfo>(di => di.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

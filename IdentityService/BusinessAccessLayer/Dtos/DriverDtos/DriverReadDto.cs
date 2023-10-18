@@ -12,16 +12,14 @@ namespace BAL.Dtos
 
         public string Username { get; set; }
 
-        public string Name { get; set; }
-
         public string Phone { get; set; }
 
         public string Email { get; set; }
 
-        public double Rating { get; set; }
+        public float Rating { get; set; }
 
-        public int Experience { get; set; }
+        public DriverInfoDto DriverInfoDto { get; set; }
 
-        public List<DriverRatingDto> driverRatingDtos { get; set; }
+        public List<UserRatingDto> UserRatingDtos { get; set; }
     }
 }

@@ -15,10 +15,10 @@ namespace BAL.Dtos
 
         public string Phone { get; set; }
 
-        public string? Email { get; set; }
+        public string Email { get; set; }
 
         public float Rating { get; set; }
 
-        public List<ClientRatingDto> clientRatingsDtos { get; set; }
+        public List<UserRatingDto> UserRatingDtos { get; set; }
     }
 }

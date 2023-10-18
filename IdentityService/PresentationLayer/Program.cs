@@ -6,6 +6,7 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
 using Microsoft.OpenApi.Models;
 using PresentationLayer.Extentions;
+using PresentationLayer.Hubs;
 using PresentationLayer.Middlewares;
 
 namespace PresentationLayer
@@ -59,6 +60,15 @@ namespace PresentationLayer
             });
             });
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowClient",
+                    builder => builder.WithOrigins("http://localhost:3000")
+                                     .AllowAnyHeader()
+                                     .AllowAnyMethod()
+                                     .AllowCredentials());
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -71,12 +81,20 @@ namespace PresentationLayer
             {
                 PrepDb.UseMigration(app);
             }
+            app.UseCors("AllowClient");
+           // app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
+            //app.UseHttpsRedirection();
 
-            app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
-            app.UseHttpsRedirection();
+            app.UseRouting();
 
             app.UseAuthentication();
+
             app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<OrderHub>("api/order/chat");
+            });
 
             app.MapControllers();
 
