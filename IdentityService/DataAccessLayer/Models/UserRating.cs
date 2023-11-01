@@ -8,7 +8,7 @@ namespace DAL.Models
 {
     public class UserRating
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public int Mark { get; set; }
 

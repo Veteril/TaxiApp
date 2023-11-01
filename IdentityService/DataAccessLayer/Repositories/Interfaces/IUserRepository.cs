@@ -18,6 +18,8 @@ namespace DAL.Repositories
 
         Task<User> GetUserByUsernameAsync(string username);
 
+        Task CreateUserRatingAsync(UserRating userRating);
+
         Task<bool> IsPhoneUniqueAsync(string phone, CancellationToken cancellationToken);
         
         Task<bool> IsUsernameUniqueAsync(string username, CancellationToken cancellationToken);
