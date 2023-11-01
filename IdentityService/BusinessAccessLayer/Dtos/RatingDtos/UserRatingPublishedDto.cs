@@ -4,15 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DAL.Models
+namespace BAL.Dtos.RatingDtos
 {
-    public class UserRating
+    public class UserRatingPublishedDto
     {
-        public Guid Id { get; set; }
+        public string UserId { get; set; }
 
         public int Mark { get; set; }
 
-        public Guid UserId { get; set; }
-        public User User { get; set; }
+        public string Event {  get; set; }
     }
 }

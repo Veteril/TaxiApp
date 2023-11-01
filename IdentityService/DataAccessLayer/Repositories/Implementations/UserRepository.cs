@@ -31,7 +31,10 @@ namespace DAL.Repositories
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            return await _dbContext.Users.Include(u => u.DriverInfo).ToListAsync();
+            return await _dbContext.Users
+                .Include(u => u.DriverInfo)
+                .Include(u => u.UserRatings)
+                .ToListAsync();
         }
 
         public async Task<User> GetUserByIdAsync(string id)
@@ -51,6 +54,11 @@ namespace DAL.Repositories
             return await _dbContext.Users
                 .Include(c => c.UserRatings)
                 .FirstOrDefaultAsync(c => c.Username == username);
+        }
+
+        public async Task CreateUserRatingAsync(UserRating userRating)
+        {
+            await _dbContext.UserRatings.AddAsync(userRating);
         }
 
         public async Task<bool> IsPhoneUniqueAsync(string phone, CancellationToken cancellationToken)

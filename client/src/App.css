@@ -1,0 +1,106 @@
+Form Button {
+    
+    width: 100%;
+}
+
+input {
+    
+    margin: 5px;
+    padding: 5px;   
+}
+button {
+    margin: 5px;
+    text-align: center;
+    width: 43%;
+    align-items: center;
+}
+
+.for-button {
+
+    display: grid;
+  place-items: center;
+  height: 5vh;
+}
+
+.log-out {
+    margin: auto;
+    overflow: auto;
+}
+
+h2 {
+    color: #292525;
+    text-align: center;
+}
+
+h6 {
+    color: greenyellow;
+}
+
+hr.line {
+    border: 1px solid #313131;
+    width: 175px;
+}
+
+.app {
+    
+
+   
+    margin: auto;
+    padding-top: 40px;
+    width: 950px;
+    text-align: center;
+}
+
+.lobby {
+    width: 400px;
+    margin: auto;
+}
+
+.chat {
+    display: grid;
+}
+
+.leave-room {
+    text-align: right;
+    margin-bottom: 4px;
+    color: rgb(255, 200, 0);
+}
+
+.user-list {
+    float: left;
+    background-color: #313131;
+    color:white;
+    width: 200px;
+    height: 440px;
+    margin-right: 4px;
+}
+
+.message-container {
+    height: 400px;    
+    background-color: rgb(74, 198, 140);
+    overflow: auto;
+    border-radius: 5px;
+    margin-bottom: 2px;
+}
+
+.user-message {
+    text-align: right;
+    padding-right: 5px;
+    font-size: 18px;
+}
+
+.message {
+    display: inline-flex;
+    margin: 0px auto 0px auto;
+    padding: 5px;
+    font-size: 18px;
+    color:rgb(13, 11, 11);
+    border-radius: 20px;
+    margin-top: 3px;
+}
+
+.from-user {
+    font-size: small;
+    margin-bottom: 3px;
+    margin-right: 5px;
+}

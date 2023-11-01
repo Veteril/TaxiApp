@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BAL.Dtos;
+using BAL.Dtos.RatingDtos;
 using DAL.Models;
 
 namespace BAL.Profiles
@@ -18,6 +19,10 @@ namespace BAL.Profiles
         private void UserRatingConfiguration()
         {
             CreateMap<UserRating, UserRatingDto>();
+
+            CreateMap<UserRatingPublishedDto, UserRating>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.Mark, opt => opt.MapFrom(src => src.Mark));
         }
 
         private void UserClientConfiguration()

@@ -14,6 +14,5 @@ namespace PresentationLayer.Hubs
         {
             await Clients.Group(roomId).SendAsync("ReceiveMessage", username, message);
         }
-
     }
 }

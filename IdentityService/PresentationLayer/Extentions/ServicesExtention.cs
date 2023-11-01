@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using BAL.MessageBus;
 
 namespace PresentationLayer.Extentions
 {
@@ -34,7 +35,6 @@ namespace PresentationLayer.Extentions
 
             ConfigureDatabaseContext(services, environment, config);
 
-
             return services;
         }
 
@@ -45,7 +45,10 @@ namespace PresentationLayer.Extentions
 
         private static void ConfigureServices (this IServiceCollection services) 
         {
-            
+            services.AddHostedService<MessageBusSubscriber>();
+
+            services.AddSingleton<IEventProcessorService, EventProcessorService>();
+
             services.AddScoped<IUserService , UserService>();
 
             services.AddScoped<ITokenService, TokenService>();

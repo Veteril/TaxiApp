@@ -6,17 +6,23 @@ import { observer } from "mobx-react-lite";
 function Lobby () {
 
     const {store} = useContext(Context);
-    const [room, setRoom] = useState();
+    const [room, setRoom] = useState('');
    
-
     return(
-        <Form className ='lobby'>
+        <Form className ='lobby'
+            onSubmit={e => {
+                e.preventDefault();
+     //           SignalRService.joinRoom(store.user.username, room);
+            }}
+        >
             <Form.Group>
-                <Form.Control placeholder='name'  />
-                <Form.Control placeholder='room'  />
-            </Form.Group> 
-            <Button variant='success' type='submit' disabled={ !room}>
-                    Join
+                <Form.Control 
+                placeholder='room' 
+                onChange={e => setRoom(e.target.value)}
+                value={room} />
+            </Form.Group>  
+            <Button variant='success' type='submit' disabled={!room}>
+                    Create Order
             </Button>
         </Form> 
     );
